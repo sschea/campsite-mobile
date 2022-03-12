@@ -28,6 +28,7 @@ function RenderCampsite(props) {
     const view = React.createRef();
 
     const recognizeDrag = ({dx}) => (dx < -200) ? true : false;
+    const recognizeComment = ({dx}) => (dx > 200) ? true : false;
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -56,6 +57,9 @@ function RenderCampsite(props) {
                     { cancelable: false }
                 );
             }
+            else if(recognizeComment(gestureState)) {
+                props.onShowModal();
+            }    
             return true;
         }
     });
@@ -175,19 +179,18 @@ class CampsiteInfo extends Component {
         const comments = this.props.comments.comments.filter(comment => comment.campsiteId === campsiteId);
         return (
             <ScrollView>
-                <RenderCampsite 
-                    campsite={campsite}
+               <RenderCampsite campsite={campsite}
                     favorite={this.props.favorites.includes(campsiteId)}
                     markFavorite={() => this.markFavorite(campsiteId)}
                     onShowModal={() => this.toggleModal()}
                 />
                 <RenderComments comments={comments} />
+
                 <Modal
                     animationType={'slide'}
                     transparent={false}
                     visible={this.state.showModal}
-                    onRequestClose={() => this.toggleModal()}
-                >
+                    onRequestClose={() => this.toggleModal()}>
                     <View style={styles.modal}>
                         <Rating
                             showRating
@@ -214,6 +217,8 @@ class CampsiteInfo extends Component {
                             onChangeText={(text)=>this.setState({text: text})}
                             value={this.state.text}
                         />
+
+                        <View style={{margin: 10}}>
                         <Button
                            title='Submit'
                            color='#5637DD'
@@ -223,6 +228,7 @@ class CampsiteInfo extends Component {
                            }}
                         >
                         </Button>
+                        </View>
                         <View style={{margin: 10}}>
                             <Button
                                 onPress={() => {
@@ -236,7 +242,7 @@ class CampsiteInfo extends Component {
                     </View>
                 </Modal>
             </ScrollView>
-        );       
+        );
     }
 }
 
